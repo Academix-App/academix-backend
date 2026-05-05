@@ -1,8 +1,8 @@
 const request = require("supertest");
 
 describe("POST /register", () => {
-    describe("Casos de erro", () => {
-        test("Deve gerar um erro pela falta do campo phone", async () => {
+    describe("Error cases", () => {
+        test("Should return an error when phone field is missing", async () => {
             const newUser = {
                 name: "Maria Oliveira",
                 email: "maria.oliveira@example.com",
@@ -16,7 +16,7 @@ describe("POST /register", () => {
             expect(response.status).toBe(400);
         });
 
-        test("Deve gerar um erro pela falta do campo name", async () => {
+        test("Should return an error when name field is missing", async () => {
             const newUser = {
                 email: "maria.oliveira@example.com",
                 phone: "11987654321",
@@ -30,7 +30,7 @@ describe("POST /register", () => {
             expect(response.status).toBe(400);
         });
 
-        test("Deve gerar um erro pela falta do campo email", async () => {
+        test("Should return an error when email field is missing", async () => {
             const newUser = {
                 name: "Maria Oliveira",
                 phone: "11987654321",
@@ -45,8 +45,8 @@ describe("POST /register", () => {
         });
     });
 
-    describe("Casos de sucesso", () => {
-        test("Deve registrar um novo usuário com dados válidos", async () => {
+    describe("Success cases", () => {
+        test("Should register a new user with valid data", async () => {
             const newUser = {
                 name: "João Silva",
                 email: "joao.silva@example.com",
@@ -72,8 +72,8 @@ describe("POST /register", () => {
 });
 
 describe("POST /login", () => {
-    describe("Casos de erro", () => {
-        test("Deve gerar um erro ao tentar realizar o login com dados inválidos", async () => {
+    describe("Error cases", () => {
+        test("Should return an error when logging in with invalid credentials", async () => {
             const payload = {
                 email: "invalid.email@example.com",
                 password: "Senha123"
@@ -87,8 +87,8 @@ describe("POST /login", () => {
         });
     });
 
-    describe("Casos de sucesso", () => {
-        test("Deve tentar realizar o login com dados válidos", async () => {
+    describe("Success cases", () => {
+        test("Should login successfully with valid credentials", async () => {
             const payload = {
                 email: "joao.silva@example.com",
                 password: "Senha123"
