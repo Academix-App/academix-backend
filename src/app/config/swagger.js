@@ -13,7 +13,11 @@ const options = {
             {
                 url: `https://academix.xlucazzz.dev`,
                 description: 'Servidor de produção',
-            }
+            },
+            {
+                url: `http://localhost:3000`,
+                description: 'Servidor de desenvolvimento',
+            },
         ],
         components: {
             securitySchemes: {

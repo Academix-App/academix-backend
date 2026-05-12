@@ -23,7 +23,8 @@ const RecoveryCodes = database.define('recovery_codes', {
     id: {
         type: Sequelize.INTEGER,
         Allownull: true,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     accountId: {
         type: Sequelize.INTEGER,

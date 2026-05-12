@@ -31,3 +31,23 @@ CREATE TABLE `recovery_codes` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
+
+CREATE TABLE `activities` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`account_id` INT(11) NOT NULL,
+	`title` VARCHAR(128) NOT NULL,
+	`color` VARCHAR(7) NOT NULL,
+	`type` ENUM('EXAM', 'PRESENTATION', 'ASSIGNMENT', 'OTHER') NOT NULL,
+	`status` ENUM('not_delivered', 'delivered') NOT NULL DEFAULT 'not_delivered',
+	`description` VARCHAR(128) NULL DEFAULT NULL,
+	`start_date` BIGINT(20) NOT NULL,
+	`end_date` BIGINT(20) NOT NULL,
+	`created_at` BIGINT(20) NULL DEFAULT (unix_timestamp() * 1000),
+	`updated_at` BIGINT(20) NULL DEFAULT (unix_timestamp() * 1000),
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `fk_activity_account` (`account_id`) USING BTREE,
+	CONSTRAINT `fk_activity_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+;

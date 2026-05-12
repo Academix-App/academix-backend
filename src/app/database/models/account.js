@@ -24,7 +24,8 @@ const Accounts = database.define('accounts', {
     id: {
         type: Sequelize.INTEGER,
         Allownull: true,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     email: {
         type: Sequelize.STRING,
