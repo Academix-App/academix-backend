@@ -6,6 +6,7 @@ const database = require("../index")
  * @typedef {Object} ActivityAttributes
  * @property {number} id
  * @property {number} accountId
+ * @property {number} disciplineId
  * @property {string} title
  * @property {string} color
  * @property {string} type
@@ -35,6 +36,11 @@ const Activities = database.define('activities', {
         type: Sequelize.INTEGER,
         Allownull: true,
         field: "account_id"
+    },
+    disciplineId: {
+        type: Sequelize.INTEGER,
+        Allownull: true,
+        field: "discipline_id"
     },
     title: {
         type: Sequelize.STRING(128),

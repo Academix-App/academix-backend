@@ -1,4 +1,5 @@
 const ActivityRepository = require("../repositories/activity.repository")
+const DisciplineRepository = require("../repositories/discipline.repository")
 
 class ActivityService {
     /**
@@ -33,6 +34,25 @@ class ActivityService {
      * @param {Object} data
      */
     async create(data) {
+        const discipline = await DisciplineRepository.findById(data.disciplineId)
+        if (discipline?.error) {
+            return {
+                error: true,
+                message: "Disciplina não encontrada.",
+                id: "discipline_not_found",
+                status: 404
+            }
+        }
+
+        if (discipline.dataValues.accountId !== data.accountId) {
+            return {
+                error: true,
+                message: "Você não tem permissão para adicionar atividades a esta disciplina.",
+                id: "discipline_forbidden",
+                status: 403
+            }
+        }
+
         return await ActivityRepository.create(data)
     }
 
@@ -50,6 +70,25 @@ class ActivityService {
                 error: true,
                 message: "Você não tem permissão para modificar esta atividade.",
                 id: "activity_forbidden",
+                status: 403
+            }
+        }
+
+        const discipline = await DisciplineRepository.findById(data.disciplineId)
+        if (discipline?.error) {
+            return {
+                error: true,
+                message: "Disciplina não encontrada.",
+                id: "discipline_not_found",
+                status: 404
+            }
+        }
+
+        if (discipline.dataValues.accountId !== accountId) {
+            return {
+                error: true,
+                message: "Você não tem permissão para modificar esta atividade.",
+                id: "discipline_forbidden",
                 status: 403
             }
         }

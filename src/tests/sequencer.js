@@ -4,6 +4,7 @@ class CustomSequencer extends Sequencer {
   sort(tests) {
     const order = [
       "auth.test.js",
+      "discipline.test.js",
       "activity.test.js",
     ];
 

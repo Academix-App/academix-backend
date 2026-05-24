@@ -9,6 +9,7 @@ beforeAll(async () => {
 });
 
 const validActivity = {
+    disciplineId: 2,
     title: "Prova de Cálculo",
     color: "#FF5733",
     type: "EXAM",
@@ -135,6 +136,7 @@ describe("POST /activities", () => {
                 error: false,
                 message: "Atividade criada com sucesso.",
                 data: {
+                    disciplineId: validActivity.disciplineId,
                     title: validActivity.title,
                     color: validActivity.color,
                     type: validActivity.type,

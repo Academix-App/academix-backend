@@ -6,6 +6,10 @@ const ActivityService = require('../services/activity.service')
 class ActivityController {
     constructor() {
         this.activitySchema = zod.object({
+            disciplineId: zod.number({
+                required_error: "O ID da disciplina é obrigatório",
+                invalid_type_error: "O ID da disciplina deve ser um número válido."
+            }).int("O ID da disciplina deve ser um número válido.").positive("O ID da disciplina deve ser um número válido."),
             title: zod
                 .string({
                     required_error: "O título é obrigatório",
@@ -76,7 +80,7 @@ class ActivityController {
      * @param {express.Response} res
      */
     async create(req, res) {
-        const { title, color, type, status, description, startDate, endDate } = req.body
+        const { title, color, type, status, description, startDate, endDate, disciplineId } = req.body
 
         const activity = await ActivityService.create({
             accountId: req.account.id,
@@ -86,10 +90,11 @@ class ActivityController {
             status,
             description: description ?? null,
             startDate,
-            endDate
+            endDate,
+            disciplineId
         })
 
-        if (activity?.error) return res.status(500).json(activity)
+        if (activity?.error) return res.status(activity.status || 500).json(activity)
 
         return res.status(201).json({
             error: false,
@@ -149,10 +154,11 @@ class ActivityController {
             status,
             description: description ?? null,
             startDate,
-            endDate
+            endDate,
+            disciplineId: req.body.disciplineId
         })
 
-        if (result?.error) return res.status(result.status).json(result)
+        if (result?.error) return res.status(result.status || 500).json(result)
 
         return res.status(200).json({
             error: false,
@@ -169,7 +175,7 @@ class ActivityController {
         const { id } = req.params
 
         const result = await ActivityService.deleteForAccount(id, req.account.id)
-        if (result?.error) return res.status(result.status).json(result)
+        if (result?.error) return res.status(result.status || 500).json(result)
 
         return res.status(200).json({
             error: false,
