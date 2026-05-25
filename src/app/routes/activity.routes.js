@@ -19,12 +19,13 @@ const SchemaParserMiddleware = require('../middlewares/schema.middleware')
  *           schema:
  *             type: object
  *             required:
- *               - title
- *               - color
- *               - type
- *               - status
- *               - startDate
- *               - endDate
+	*               - title
+	*               - color
+	*               - type
+	*               - status
+	*               - startDate
+	*               - endDate
+	*               - disciplineId
  *             properties:
  *               title:
  *                 type: string
@@ -41,6 +42,9 @@ const SchemaParserMiddleware = require('../middlewares/schema.middleware')
  *               description:
  *                 type: string
  *                 nullable: true
+	*               disciplineId:
+	*                 type: integer
+	*                 example: 1
  *               startDate:
  *                 type: number
  *                 example: 1700000000000
@@ -76,6 +80,11 @@ Router.post("/activities", AuthMiddleware, SchemaParserMiddleware(ActivityContro
  *         schema:
  *           type: number
  *         description: Filtrar por data de término (UNIX timestamp)
+	*       - in: query
+	*         name: disciplineId
+	*         schema:
+	*           type: integer
+	*         description: Filtrar por disciplina (ID da disciplina)
  *     responses:
  *       200:
  *         description: Atividades obtidas com sucesso
@@ -131,12 +140,13 @@ Router.get("/activities/:id", AuthMiddleware, ActivityController.show)
  *           schema:
  *             type: object
  *             required:
- *               - title
- *               - color
- *               - type
- *               - status
- *               - startDate
- *               - endDate
+	*               - title
+	*               - color
+	*               - type
+	*               - status
+	*               - startDate
+	*               - endDate
+	*               - disciplineId
  *             properties:
  *               title:
  *                 type: string
@@ -151,6 +161,9 @@ Router.get("/activities/:id", AuthMiddleware, ActivityController.show)
  *               description:
  *                 type: string
  *                 nullable: true
+	*               disciplineId:
+	*                 type: integer
+	*                 example: 1
  *               startDate:
  *                 type: number
  *               endDate:
