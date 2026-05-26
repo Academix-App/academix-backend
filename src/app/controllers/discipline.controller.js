@@ -17,7 +17,13 @@ class DisciplineController {
                     required_error: "O nome do professor é obrigatório",
                     invalid_type_error: "O nome do professor é obrigatório"
                 })
-                .min(1, "O nome do professor é obrigatório")
+                .min(1, "O nome do professor é obrigatório"),
+            color: zod
+                .string({
+                    required_error: "A cor é obrigatória",
+                    invalid_type_error: "A cor é obrigatória"
+                })
+                .regex(/^#[0-9A-Fa-f]{6}$/, "A cor deve estar no formato hexadecimal (#RRGGBB).")
         })
     }
 
@@ -26,12 +32,13 @@ class DisciplineController {
      * @param {express.Response} res
      */
     async create(req, res) {
-        const { name, teacher } = req.body
+        const { name, teacher, color } = req.body
 
         const discipline = await DisciplineService.create({
             accountId: req.account.id,
             name,
-            teacher
+            teacher,
+            color
         })
 
         if (discipline?.error) return res.status(discipline.status || 500).json(discipline)
@@ -80,11 +87,12 @@ class DisciplineController {
      */
     async update(req, res) {
         const { id } = req.params
-        const { name, teacher } = req.body
+        const { name, teacher, color } = req.body
 
         const result = await DisciplineService.updateForAccount(id, req.account.id, {
             name,
-            teacher
+            teacher,
+            color
         })
 
         if (result?.error) return res.status(result.status).json(result)

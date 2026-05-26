@@ -8,6 +8,7 @@ const database = require("../index")
  * @property {number} accountId
  * @property {string} name
  * @property {string} teacher
+ * @property {string} color
  * @property {number} createdAt
  * @property {number} updatedAt
  */
@@ -37,6 +38,10 @@ const Disciplines = database.define('disciplines', {
     },
     teacher: {
         type: Sequelize.STRING(128),
+        Allownull: true
+    },
+    color: {
+        type: Sequelize.STRING(7),
         Allownull: true
     },
     createdAt: {

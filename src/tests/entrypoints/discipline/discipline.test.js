@@ -9,12 +9,44 @@ beforeAll(async () => {
 });
 
 const validDiscipline = {
-   name: "Matemática",
-   teacher: "Prof. João"
+    name: "Matemática",
+    teacher: "Prof. João",
+    color: "#FF5733"
 };
 
 describe("POST /disciplines", () => {
     describe("Error cases", () => {
+        test("Should return 400 when color is missing", async () => {
+            const { color, ...body } = validDiscipline;
+
+            const response = await request(app)
+                .post("/disciplines")
+                .set("Authorization", `Bearer ${token}`)
+                .send(body);
+
+            expect(response.status).toBe(400);
+            expect(response.body.id).toBe("invalid_schema");
+        });
+
+        test("Should return 400 when color is invalid (no #)", async () => {
+            const response = await request(app)
+                .post("/disciplines")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ ...validDiscipline, color: "FF5733" });
+
+            expect(response.status).toBe(400);
+            expect(response.body.id).toBe("invalid_schema");
+        });
+
+        test("Should return 400 when color has more than 7 characters", async () => {
+            const response = await request(app)
+                .post("/disciplines")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ ...validDiscipline, color: "#FF57331" });
+
+            expect(response.status).toBe(400);
+            expect(response.body.id).toBe("invalid_schema");
+        });
         test("Should return 401 when creating discipline without authentication", async () => {
             const response = await request(app)
                 .post("/disciplines")
@@ -61,7 +93,8 @@ describe("POST /disciplines", () => {
                 message: "Disciplina criada com sucesso.",
                 data: {
                     name: validDiscipline.name,
-                    teacher: validDiscipline.teacher
+                    teacher: validDiscipline.teacher,
+                    color: validDiscipline.color
                 }
             });
 
@@ -80,7 +113,8 @@ describe("POST /disciplines", () => {
                 message: "Disciplina criada com sucesso.",
                 data: {
                     name: validDiscipline.name,
-                    teacher: validDiscipline.teacher
+                    teacher: validDiscipline.teacher,
+                    color: validDiscipline.color
                 }
             });
         });
@@ -139,7 +173,8 @@ describe("GET /disciplines/:id", () => {
             data: {
                 id: createdDisciplineId,
                 name: validDiscipline.name,
-                teacher: validDiscipline.teacher
+                teacher: validDiscipline.teacher,
+                color: validDiscipline.color
             }
         });
     });
@@ -178,7 +213,8 @@ describe("PUT /disciplines/:id", () => {
         const updatedData = {
             ...validDiscipline,
             name: "Álgebra Linear",
-            teacher: "João Silva"
+            teacher: "João Silva",
+            color: "#123456"
         };
 
         const response = await request(app)
@@ -193,6 +229,7 @@ describe("PUT /disciplines/:id", () => {
         });
         expect(response.body.data.name).toBe("Álgebra Linear");
         expect(response.body.data.teacher).toBe("João Silva");
+        expect(response.body.data.color).toBe("#123456");
     });
 });
 

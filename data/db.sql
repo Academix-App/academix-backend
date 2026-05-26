@@ -37,6 +37,7 @@ CREATE TABLE `disciplines` (
 	`account_id` INT(11) NOT NULL,
 	`name` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`teacher` VARCHAR(128) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`color` VARCHAR(7) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`created_at` BIGINT(20) NULL DEFAULT (unix_timestamp() * 1000),
 	`updated_at` BIGINT(20) NULL DEFAULT (unix_timestamp() * 1000),
 	PRIMARY KEY (`id`) USING BTREE,

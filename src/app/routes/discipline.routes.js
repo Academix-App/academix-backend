@@ -21,6 +21,7 @@ const SchemaParserMiddleware = require('../middlewares/schema.middleware')
  *             required:
  *               - nome
  *               - professor
+ *               - color
  *             properties:
  *               nome:
  *                 type: string
@@ -28,6 +29,9 @@ const SchemaParserMiddleware = require('../middlewares/schema.middleware')
  *               professor:
  *                 type: string
  *                 example: João Silva
+ *               color:
+ *                 type: string
+ *                 example: "#FF5733"
  *     responses:
  *       201:
  *         description: Disciplina criada com sucesso
@@ -114,10 +118,13 @@ Router.get("/disciplines/:id", AuthMiddleware, DisciplineController.show)
  *             required:
  *               - nome
  *               - professor
+ *               - color
  *             properties:
  *               nome:
  *                 type: string
  *               professor:
+ *                 type: string
+ *               color:
  *                 type: string
  *     responses:
  *       200:
