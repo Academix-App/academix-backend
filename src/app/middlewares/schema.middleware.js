@@ -11,7 +11,7 @@ module.exports = (bodySchema, querySchema) => {
         try {
             const query = {}
             for (const param in req.query) {
-                query[param] = isNaN(query[param]) ? query[param] : Number(query[param])
+                query[param] = isNaN(query[param]) ? req.query[param] : Number(req.query[param])
             }
 
             if (bodySchema) {

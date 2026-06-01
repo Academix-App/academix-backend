@@ -48,6 +48,7 @@ class ActivityRepository {
      * @param {Object} filters
      * @param {number} [filters.startDate]
      * @param {number} [filters.endDate]
+     * @param {number} [filters.disciplineId]
      */
     async findAllByAccountId(accountId, filters = {}) {
         const where = { accountId }
@@ -58,6 +59,10 @@ class ActivityRepository {
 
         if (filters.endDate) {
             where.endDate = { ...(where.endDate || {}), [Op.lte]: filters.endDate }
+        }
+
+        if (filters.disciplineId) {
+            where.disciplineId = filters.disciplineId
         }
 
         const activities = await Activities.findAll({
