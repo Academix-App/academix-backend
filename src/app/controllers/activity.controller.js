@@ -59,18 +59,25 @@ class ActivityController {
 
         this.activityQuerySchema = zod.object({
             startDate: zod
-                .number({
+                .coerce.number({
                     invalid_type_error: "A data de início deve ser um número válido."
                 })
                 .int("A data de início deve ser um número válido.")
                 .positive("A data de início deve ser um número válido.")
                 .optional(),
             endDate: zod
-                .number({
+                .coerce.number({
                     invalid_type_error: "A data de término deve ser um número válido."
                 })
                 .int("A data de término deve ser um número válido.")
                 .positive("A data de término deve ser um número válido.")
+                .optional(),
+            disciplineId: zod
+                .coerce.number({
+                    invalid_type_error: "O ID da disciplina deve ser um número válido."
+                })
+                .int("O ID da disciplina deve ser um número válido.")
+                .positive("O ID da disciplina deve ser um número válido.")
                 .optional()
         })
     }
