@@ -6,6 +6,8 @@ class CustomSequencer extends Sequencer {
       "auth.test.js",
       "discipline.test.js",
       "activity.test.js",
+      "aiSummary.test.js",
+      "aiVerification.test.js",
     ];
 
     return tests.sort((a, b) => {
