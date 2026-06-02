@@ -5,6 +5,31 @@ const BotService = require('../services/bot.service')
 
 class BotController {
     constructor() {
+        this.disciplineSchema = zod.object({
+            accountId: zod.number({
+                required_error: "O ID da conta é obrigatório",
+                invalid_type_error: "O ID da conta deve ser um número válido."
+            }).int("O ID da conta deve ser um número válido.").positive("O ID da conta deve ser um número válido."),
+            name: zod
+                .string({
+                    required_error: "O nome é obrigatório",
+                    invalid_type_error: "O nome é obrigatório"
+                })
+                .min(1, "O nome é obrigatório"),
+            teacher: zod
+                .string({
+                    required_error: "O nome do professor é obrigatório",
+                    invalid_type_error: "O nome do professor é obrigatório"
+                })
+                .min(1, "O nome do professor é obrigatório"),
+            color: zod
+                .string({
+                    required_error: "A cor é obrigatória",
+                    invalid_type_error: "A cor é obrigatória"
+                })
+                .regex(/^#[0-9A-Fa-f]{6}$/, "A cor deve estar no formato hexadecimal (#RRGGBB).")
+        })
+
         this.activitySchema = zod.object({
             accountId: zod.number({
                 required_error: "O ID da conta é obrigatório",
@@ -159,6 +184,29 @@ class BotController {
             error: false,
             message: "Disciplinas obtidas com sucesso.",
             data: disciplines
+        })
+    }
+
+    /**
+     * @param {express.Request} req
+     * @param {express.Response} res
+     */
+    async createDiscipline(req, res) {
+        const { accountId, name, teacher, color } = req.body
+
+        const discipline = await BotService.createDiscipline({
+            accountId,
+            name,
+            teacher,
+            color
+        })
+
+        if (discipline?.error) return res.status(discipline.status || 500).json(discipline)
+
+        return res.status(201).json({
+            error: false,
+            message: "Disciplina criada com sucesso.",
+            data: discipline
         })
     }
 }

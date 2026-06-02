@@ -11,7 +11,7 @@ module.exports = (bodySchema, querySchema) => {
         try {
             const query = {}
             for (const param in req.query) {
-                query[param] = isNaN(query[param]) ? req.query[param] : Number(req.query[param])
+                query[param] = isNaN(req.query[param]) ? req.query[param] : Number(req.query[param])
             }
 
             if (bodySchema) {
@@ -28,7 +28,7 @@ module.exports = (bodySchema, querySchema) => {
                 error: true,
                 message: "Foi fornecida uma estrutura inválida",
                 data: {
-                    errors: err.issues.map(e => ({
+                    errors: (err.issues || []).map(e => ({
                         message: e.message,
                         expected: e.expected,
                         path: e.path

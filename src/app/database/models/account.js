@@ -23,34 +23,34 @@ const database = require("../index")
 const Accounts = database.define('accounts', {
     id: {
         type: Sequelize.INTEGER,
-        Allownull: true,
+        allowNull: true,
         primaryKey: true,
         autoIncrement: true
     },
     email: {
         type: Sequelize.STRING,
-        Allownull: true
+        allowNull: true
     },
     name: {
         type: Sequelize.STRING,
-        Allownull: true
+        allowNull: true
     },
     phone: {
         type: Sequelize.STRING,
-        Allownull: true
+        allowNull: true
     },
     password: {
         type: Sequelize.STRING,
-        Allownull: true
+        allowNull: true
     },
     createdAt: {
         type: Sequelize.BIGINT,
-        Allownull: true,
+        allowNull: true,
         field: "created_at"
     },
     updatedAt: {
         type: Sequelize.BIGINT,
-        Allownull: true,
+        allowNull: true,
         field: "updated_at"
     }
 }, {

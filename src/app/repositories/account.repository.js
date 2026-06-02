@@ -88,8 +88,6 @@ class AccountRepository {
             return undefined
         })
 
-        account.id = account.null
-
         if (!account) return {
             error: true,
             message: "Não foi possível efetuar a criação da conta.",

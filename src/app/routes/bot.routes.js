@@ -141,5 +141,51 @@ Router.get(
     BotController.getDisciplines.bind(BotController)
 )
 
+/**
+ * @swagger
+ * /bot/disciplines:
+ *   post:
+ *     summary: Criar uma nova disciplina (Bot)
+ *     tags: [Bot]
+ *     description: Endpoint privado para o bot criar disciplinas. Apenas requisições localhost são permitidas.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - accountId
+ *               - name
+ *               - teacher
+ *               - color
+ *             properties:
+ *               accountId:
+ *                 type: integer
+ *                 example: 1
+ *               name:
+ *                 type: string
+ *                 example: Matemática
+ *               teacher:
+ *                 type: string
+ *                 example: João Silva
+ *               color:
+ *                 type: string
+ *                 example: "#FF5733"
+ *     responses:
+ *       201:
+ *         description: Disciplina criada com sucesso
+ *       400:
+ *         description: Estrutura inválida
+ *       401:
+ *         description: Não autorizado (acesso apenas localhost)
+ */
+Router.post(
+    "/bot/disciplines",
+    PrivateAuthMiddleware,
+    SchemaParserMiddleware(BotController.disciplineSchema),
+    BotController.createDiscipline.bind(BotController)
+)
+
 module.exports = Router
 

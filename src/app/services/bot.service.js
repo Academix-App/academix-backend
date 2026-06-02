@@ -37,12 +37,18 @@ class BotService {
     }
 
     /**
-     * Listar disciplinas de uma conta
      * @param {number} accountId
      */
     async getDisciplines(accountId) {
         const disciplines = await DisciplineRepository.findAllByAccountId(accountId)
         return disciplines || []
+    }
+
+    /**
+     * @param {Object} data
+     */
+    async createDiscipline(data) {
+        return await DisciplineRepository.create(data)
     }
 }
 
