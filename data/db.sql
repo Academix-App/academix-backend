@@ -70,3 +70,28 @@ CREATE TABLE `activities` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
+CREATE TABLE `contents` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `account_id` INT(11) NOT NULL,
+    `content` TEXT NOT NULL,
+    `notifications` TINYINT(4) NOT NULL DEFAULT 0,
+    `create_timestamp` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
+    `last_notification_timestamp` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `fk_content_account` (`account_id`) USING BTREE,
+    CONSTRAINT `fk_content_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+CREATE TABLE `content_summaries` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `content_id` INT(11) NOT NULL,
+    `summary` TEXT NOT NULL,
+    `created_at` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `fk_summary_content` (`content_id`) USING BTREE,
+    CONSTRAINT `fk_summary_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;

@@ -18,13 +18,20 @@ setupSwagger(app)
 require('./handlers/routes.handler.js')(app)
 
 if (process.env.NODE_ENV !== 'test') {
-    const server = require('http').createServer(app)
+    const http = require('http')
+    const Socket = require('../app/socket/socketio.js')
+    const contentWorker = require('../app/worker/content.worker.js')
+
+    const server = http.createServer(app)
+    const socket = new Socket(server)
+    const io = socket.getIO()
 
     function StartWebService() {
         return new Promise((resolve, reject) => {
             try {
                 server.listen(process.env.SERVER_PORT, () => {
                     console.log(`[!]`.green + ` Webserver iniciado com sucesso em ` + `http://localhost:${process.env.SERVER_PORT}`.blue)
+                    contentWorker(io)
                     resolve()
                 })
             } catch (e) {
