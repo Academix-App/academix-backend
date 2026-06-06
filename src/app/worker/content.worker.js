@@ -24,7 +24,12 @@ module.exports = async (io) => {
             if (!result?.error) {
                 await ContentSummaryRepository.create(content.id, result.summary)
                 await ContentRepository.updateNotification(content.id, content.notifications + 1, Date.now())
-                io.emit("summary", { contentId: content.id, summary: result.summary })
+                
+                // ✅ Emite só para o account dono do content
+                io.to(`account:${content.accountId}`).emit("summary", {
+                    contentId: content.id,
+                    summary: result.summary
+                })
             }
         }
     }
