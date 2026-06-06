@@ -1,4 +1,5 @@
 const Contents = require("../database/models/contents")
+const ContentSummaries = require("../database/models/contentsSummaries")
 
 class ContentRepository {
     /**
@@ -8,10 +9,19 @@ class ContentRepository {
         const contents = await Contents.findAll({
             where: {
                 accountId
-            }
+            },
+            include: [
+                {
+                    model: ContentSummaries,
+                    as: "summaries",
+                    attributes: ["summary", "createdAt"],
+                    order: [["createdAt", "DESC"]],
+                    limit: 1,
+                    required: false
+                }
+            ]
         }).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -36,7 +46,6 @@ class ContentRepository {
             }
         }).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -64,7 +73,6 @@ class ContentRepository {
             lastNotificationTimestamp: now
         }).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -90,7 +98,6 @@ class ContentRepository {
             }
         ).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -112,7 +119,6 @@ class ContentRepository {
             where: { id, accountId }
         }).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -138,7 +144,6 @@ class ContentRepository {
             }
         ).catch((e) => {
             console.log(e)
-
             return undefined
         })
 
@@ -152,20 +157,19 @@ class ContentRepository {
     }
 
     async findAll() {
-    const contents = await Contents.findAll().catch((e) => {
-        console.log(e)
+        const contents = await Contents.findAll().catch((e) => {
+            console.log(e)
+            return undefined
+        })
 
-        return undefined
-    })
+        if (!contents) return {
+            error: true,
+            message: "Não foi possível obter a lista de conteúdos.",
+            id: "internal_server_error"
+        }
 
-    if (!contents) return {
-        error: true,
-        message: "Não foi possível obter a lista de conteúdos.",
-        id: "internal_server_error"
+        return contents
     }
-
-    return contents
-}
 }
 
 module.exports = new ContentRepository()
