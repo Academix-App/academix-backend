@@ -12,6 +12,12 @@ class Socket {
             const clientIP = client.handshake.address.replace("::ffff:", "")
             console.log(`[WSS]`.green + ` Cliente ` + `${clientIP}`.yellow + ` (${client.id})`.gray + ` conectado com sucesso.`)
 
+            // ✅ Frontend emite "join" com o accountId após conectar
+            client.on("join", (accountId) => {
+                client.join(`account:${accountId}`)
+                console.log(`[WSS]`.green + ` Cliente ` + `${client.id}`.gray + ` entrou na room ` + `account:${accountId}`.yellow)
+            })
+
             client.on("disconnect", () => {
                 console.log(`[WSS]`.red + ` Cliente ` + `${clientIP}`.yellow + ` (${client.id})`.gray + ` desconectado.`)
             })
