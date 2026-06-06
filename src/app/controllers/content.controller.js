@@ -2,6 +2,8 @@ const express = require('express')
 const zod = require('zod')
 const ContentService = require('../services/content.service')
 const ContentSummaryService = require('../services/contenSummary.service')
+const SummaryAiCommunication = require('../ai/summaryAiCommunication')
+const ContentSummaryRepository = require('../repositories/contentSummary.repository')
 
 class ContentController {
     constructor() {
@@ -93,10 +95,19 @@ class ContentController {
         const newContent = await ContentService.createContent(req.account.id, content)
         if (newContent?.error) return res.status(500).json(newContent)
 
+        const summaryResult = await SummaryAiCommunication.generate(content)
+
+        if (!summaryResult?.error) {
+            await ContentSummaryRepository.create(newContent.id, summaryResult.summary)
+        }
+
         return res.status(201).json({
             error: false,
             message: "Conteúdo criado com sucesso.",
-            data: newContent
+            data: {
+                ...newContent.dataValues,
+                summary: summaryResult?.error ? null : summaryResult.summary
+            }
         })
     }
 
