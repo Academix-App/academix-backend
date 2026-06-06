@@ -14,12 +14,17 @@ class NanoBananaClient {
         try {
             const response = await this.client.models.generateContent({
                 model: "gemini-2.0-flash",
-                contents: prompt
+                contents: [
+                    {
+                        role: "user",
+                        parts: [{ text: prompt }]
+                    }
+                ]
             })
 
             return response.text
         } catch (error) {
-            console.log(error)
+            console.log("Erro Gemini:", error)
 
             return {
                 error: true,
