@@ -1,5 +1,4 @@
 const Sequelize = require("sequelize")
-
 const database = require("../index")
 
 /**
@@ -54,5 +53,8 @@ const Contents = database.define('contents', {
     timestamps: false,
     freezeTableName: true
 })
+
+const ContentSummaries = require("./contentsSummaries")
+Contents.hasMany(ContentSummaries, { foreignKey: "content_id", as: "summaries" })
 
 module.exports = Contents
