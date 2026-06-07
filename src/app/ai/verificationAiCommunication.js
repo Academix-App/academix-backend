@@ -5,22 +5,22 @@ class VerificationAiCommunication {
      * @param {string} input
      */
     buildPrompt(input) {
-        return `Você é um agente especializado em verificação de veracidade de informações.
+        return `Você é um perito em jornalismo investigativo e verificação de fatos.
+Sua missão é detectar desinformação com alta precisão.
 
-Analise o conteúdo abaixo e determine o quanto ele é verdadeiro com base em fatos verificáveis, fontes confiáveis e conhecimento consolidado.
+PROCEDIMENTO DE ANÁLISE:
+1. LEITURA: Identifique as afirmações principais do conteúdo.
+2. CRÍTICA: Questione se a informação parece lógica, se cita fontes datáveis e se o tom é sensacionalista.
+3. CETICISMO: Mesmo que a fonte pareça oficial, verifique se não há contradições internas no texto.
+4. VEREDITO: Se houver qualquer dúvida sobre a veracidade, a nota deve ser penalizada.
 
-Conteúdo: ${input}
+Conteúdo: "${input}"
 
-Retorne apenas um objeto JSON válido, sem texto adicional, sem markdown, seguindo exatamente esta estrutura:
-
+Retorne APENAS um JSON:
 {
-    "percentage": 85,
-    "justification": "justificativa detalhada aqui"
-}
-
-Onde:
-- "percentage" é um número inteiro de 0 a 100 representando o percentual de veracidade
-- "justification" é uma explicação clara e objetiva do porquê dessa porcentagem`
+    "percentage": [0-100],
+    "justification": "Explicação detalhada contendo: 1. A análise dos pontos principais; 2. Avaliação da credibilidade das fontes citadas; 3. Veredito final sobre a veracidade."
+}`
     }
 
     /**
