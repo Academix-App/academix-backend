@@ -32,7 +32,7 @@ const Verifications = database.define('verifications', {
         field: "account_id"
     },
     input: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT('long'),
         allowNull: false
     },
     percentage: {
@@ -40,7 +40,7 @@ const Verifications = database.define('verifications', {
         allowNull: false
     },
     justification: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT('long'),
         allowNull: false
     },
     createdAt: {

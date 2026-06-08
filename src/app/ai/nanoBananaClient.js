@@ -7,6 +7,15 @@ class NanoBananaClient {
         })
     }
 
+    #handleError(error) {
+        console.log("Erro Gemini:", error)
+        return {
+            error: true,
+            message: "Erro ao chamar IA",
+            id: "ai_request_error"
+        }
+    }
+
     /**
      * @param {string} prompt
      */
@@ -24,13 +33,37 @@ class NanoBananaClient {
 
             return response.text
         } catch (error) {
-            console.log("Erro Gemini:", error)
+            return this.#handleError(error)
+        }
+    }
 
-            return {
-                error: true,
-                message: "Erro ao chamar IA",
-                id: "ai_request_error"
-            }
+    /**
+     * @param {string} prompt
+     * @param {string} pdfBase64
+     */
+    async generateContentWithPdf(prompt, pdfBase64) {
+        try {
+            const response = await this.client.models.generateContent({
+                model: "gemini-2.0-flash",
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            {
+                                inlineData: {
+                                    mimeType: "application/pdf",
+                                    data: pdfBase64
+                                }
+                            },
+                            { text: prompt }
+                        ]
+                    }
+                ]
+            })
+
+            return response.text
+        } catch (error) {
+            return this.#handleError(error)
         }
     }
 }

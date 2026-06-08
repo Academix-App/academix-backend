@@ -19,13 +19,16 @@ class VerificationService {
 
     /**
      * @param {number} accountId
-     * @param {string} input
+     * @param {string|null} input
+     * @param {Buffer|null} pdfBuffer
      */
-    async createVerification(accountId, input) {
-        const result = await VerificationAiCommunication.verify(input)
+    async createVerification(accountId, input, pdfBuffer) {
+        const result = await VerificationAiCommunication.verify(input, pdfBuffer)
         if (result?.error) return result
 
-        return await VerificationRepository.create(accountId, input, result.percentage, result.justification)
+        const storedInput = input ?? "PDF enviado pelo usuário"
+
+        return await VerificationRepository.create(accountId, storedInput, result.percentage, result.justification)
     }
 
     /**

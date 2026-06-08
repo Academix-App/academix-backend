@@ -1,10 +1,17 @@
+const axios = require("axios")
 const NanoBananaClient = require("./nanoBananaClient")
+
+const URL_REGEX = /^https?:\/\/.+/i
 
 class VerificationAiCommunication {
     /**
-     * @param {string} input
+     * @param {string} [textContent]
      */
-    buildPrompt(input) {
+    buildPrompt(textContent) {
+        const contentBlock = textContent
+            ? `Conteúdo: "${textContent}"`
+            : `Conteúdo: [O conteúdo foi enviado como PDF acima. Analise-o diretamente.]`
+
         return `Você é um perito em jornalismo investigativo e verificação de fatos.
 Sua missão é detectar desinformação com alta precisão.
 
@@ -14,7 +21,7 @@ PROCEDIMENTO DE ANÁLISE:
 3. CETICISMO: Mesmo que a fonte pareça oficial, verifique se não há contradições internas no texto.
 4. VEREDITO: Se houver qualquer dúvida sobre a veracidade, a nota deve ser penalizada.
 
-Conteúdo: "${input}"
+${contentBlock}
 
 Retorne APENAS um JSON:
 {
@@ -24,26 +31,64 @@ Retorne APENAS um JSON:
     }
 
     /**
-     * @param {string} input
+     * @param {string} url
+     * @returns {Promise<string>}
      */
-    async verify(input) {
-        const prompt = this.buildPrompt(input)
-        const response = await NanoBananaClient.generateContent(prompt)
+    async #extractTextFromUrl(url) {
+        const response = await axios.get(url, {
+            headers: { "User-Agent": "Mozilla/5.0" },
+            timeout: 8000
+        })
 
-        if (response?.error) return response
+        return response.data
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 12000)
+    }
 
+    /**
+     * @param {string} rawResponse
+     */
+    #parseAiResponse(rawResponse) {
         try {
-            const clean = response.replace(/```json|```/g, "").trim()
+            const clean = rawResponse.replace(/```json|```/g, "").trim()
             return JSON.parse(clean)
         } catch (error) {
             console.log(error)
-
             return {
                 error: true,
                 message: "Erro ao processar resposta da IA.",
                 id: "ai_parse_error"
             }
         }
+    }
+
+    /**
+     * @param {string} [input]          - texto livre ou URL
+     * @param {Buffer}  [pdfBuffer]     - buffer do PDF enviado via upload
+     */
+    async verify(input, pdfBuffer) {
+        let aiResponse
+
+        if (pdfBuffer) {
+            const pdfBase64 = pdfBuffer.toString("base64")
+            const prompt = this.buildPrompt()
+            aiResponse = await NanoBananaClient.generateContentWithPdf(prompt, pdfBase64)
+        } else if (URL_REGEX.test(input)) {
+            const pageText = await this.#extractTextFromUrl(input)
+            const prompt = this.buildPrompt(pageText)
+            aiResponse = await NanoBananaClient.generateContent(prompt)
+        } else {
+            const prompt = this.buildPrompt(input)
+            aiResponse = await NanoBananaClient.generateContent(prompt)
+        }
+
+        if (aiResponse?.error) return aiResponse
+
+        return this.#parseAiResponse(aiResponse)
     }
 }
 

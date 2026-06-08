@@ -13,4 +13,7 @@ connection.authenticate().catch(async err => {
     return process.exit()
 })
 
+
 module.exports = connection
+
+require("./models/associations")

@@ -42,7 +42,5 @@ const ContentSummaries = database.define('content_summaries', {
     freezeTableName: true
 })
 
-const Contents = require("./contents")
-ContentSummaries.belongsTo(Contents, { foreignKey: "content_id" })
 
 module.exports = ContentSummaries

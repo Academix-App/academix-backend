@@ -1,8 +1,10 @@
 const Router = require('express').Router()
+const multer = require('multer')
 
 const VerificationController = require('../controllers/verification.controller')
 const AuthMiddleware = require('../middlewares/auth.middleware')
-const SchemaParserMiddleware = require('../middlewares/schema.middleware')
+
+const upload = multer({ storage: multer.memoryStorage() })
 
 /**
  * @swagger
@@ -59,12 +61,21 @@ Router.get("/verifications/:id", AuthMiddleware, VerificationController.show.bin
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - input
  *             properties:
  *               input:
  *                 type: string
  *                 example: "A terra é plana."
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               input:
+ *                 type: string
+ *                 description: Texto livre ou URL
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: Arquivo PDF para verificação
  *     responses:
  *       201:
  *         description: Verificação realizada com sucesso
@@ -73,7 +84,7 @@ Router.get("/verifications/:id", AuthMiddleware, VerificationController.show.bin
  *       401:
  *         description: Não autorizado
  */
-Router.post("/verifications", AuthMiddleware, SchemaParserMiddleware(VerificationController.verificationCreateSchema), VerificationController.create.bind(VerificationController))
+Router.post("/verifications", AuthMiddleware, upload.single('file'), VerificationController.create.bind(VerificationController))
 
 /**
  * @swagger
