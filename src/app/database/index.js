@@ -14,4 +14,4 @@ connection.authenticate().catch(async err => {
 
 module.exports = connection
 
-require("./models/associations") // ← só isso, sem redefinir nada aqui
+require("./models/associations") 

@@ -22,7 +22,7 @@ class NanoBananaClient {
     async generateContent(prompt) {
         try {
             const response = await this.client.models.generateContent({
-                model: "gemini-3.5-flash",
+                model: "gemini-2.5-flash",
                 contents: [{ role: "user", parts: [{ text: prompt }] }]
             })
             return response.text
@@ -38,7 +38,7 @@ class NanoBananaClient {
     async generateContentWithPdf(prompt, pdfBase64) {
         try {
             const response = await this.client.models.generateContent({
-                model: "gemini-3.5-flash",
+                model: "gemini-2.5-flash",
                 contents: [{
                     role: "user",
                     parts: [
@@ -59,7 +59,7 @@ class NanoBananaClient {
     async generateContentWithHistory(turns) {
         try {
             const response = await this.client.models.generateContent({
-                model: "gemini-3.5-flash",
+                model: "gemini-2.5-flash",
                 contents: turns
             })
             return response.text
