@@ -1,13 +1,13 @@
+const cors = require("cors")
 const express = require('express')
 const app = express()
-const cors = require("cors")
 const loggerMiddleware = require('./middlewares/logger.middleware.js')
 const setupSwagger = require('./config/swagger.js')
 
+app.use(cors())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(express.static('./src/app/public', { index: false, extensions: ['html'] }))
-app.use(cors())
 
 if (process.env.NODE_ENV != "test") {
     app.use(loggerMiddleware)
