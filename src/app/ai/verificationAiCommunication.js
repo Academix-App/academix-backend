@@ -1,10 +1,9 @@
-const axios = require("axios");
-const cheerio = require("cheerio");
-const pdfParse = require("pdf-parse");
+const axios = require("axios")
+const pdfParse = require("pdf-parse")
 
-const NanoBananaClient = new (require("./nanoBananaClient"))();
+const NanoBananaClient = new (require("./nanoBananaClient"))()
 
-const URL_REGEX = /^https?:\/\/.+/i;
+const URL_REGEX = /^https?:\/\/.+/i
 
 class VerificationAiCommunication {
     /**
@@ -22,11 +21,11 @@ PROCEDIMENTO DE ANÁLISE:
 
 Conteúdo: "${textContent}"
 
-Retorne APENAS um JSON estritamente neste formato:
+Retorne APENAS um JSON:
 {
-    "percentage": [número de 0 a 100 indicando a veracidade],
-    "justification": "Sua explicação detalhada."
-}`;
+    "percentage": [0-100],
+    "justification": "Explicação detalhada contendo: 1. A análise dos pontos principais; 2. Avaliação da credibilidade das fontes citadas; 3. Veredito final sobre a veracidade."
+}`
     }
 
     /**
@@ -36,20 +35,23 @@ Retorne APENAS um JSON estritamente neste formato:
     async #extractTextFromUrl(url) {
         try {
             const response = await axios.get(url, {
-                headers: { 
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                    "Accept": "text/html"
+                headers: {
+                    "User-Agent": "Mozilla/5.0"
                 },
                 timeout: 8000
-            });
-            
-            const $ = cheerio.load(response.data);
-            $('script, style, noscript').remove();
-            
-            return $('body').text().replace(/\s+/g, " ").trim().slice(0, 12000);
+            })
+
+            return response.data
+                .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+                .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 12000)
         } catch (error) {
-            console.log("Erro ao extrair URL:", error.message);
-            return `Não foi possível acessar a URL diretamente devido a bloqueios do site. O endereço analisado foi: ${url}. Avalie a credibilidade do domínio.`;
+            console.log("Erro ao extrair URL:", error.message)
+
+            throw new Error("Falha ao acessar a URL informada.")
         }
     }
 
@@ -59,11 +61,16 @@ Retorne APENAS um JSON estritamente neste formato:
      */
     async #extractTextFromPdf(pdfBuffer) {
         try {
-            const data = await pdfParse(pdfBuffer);
-            return data.text.replace(/\s+/g, " ").trim().slice(0, 15000);
+            const data = await pdfParse(pdfBuffer)
+
+            return data.text
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 15000)
         } catch (error) {
-            console.log("Erro ao ler PDF:", error.message);
-            throw new Error("Falha ao extrair texto do documento PDF.");
+            console.log("Erro ao ler PDF:", error.message)
+
+            throw new Error("Falha ao extrair texto do documento PDF.")
         }
     }
 
@@ -72,45 +79,61 @@ Retorne APENAS um JSON estritamente neste formato:
      */
     #parseAiResponse(rawResponse) {
         try {
-            const clean = rawResponse.replace(/json|/g, "").trim();
-            return JSON.parse(clean);
+            const clean = rawResponse
+                .replace(/```json|```/g, "")
+                .trim()
+
+            return JSON.parse(clean)
         } catch (error) {
-            console.log(error);
+            console.log(error)
+
             return {
                 error: true,
                 message: "Erro ao processar resposta da IA.",
                 id: "ai_parse_error"
-            };
+            }
         }
     }
 
     /**
-     * @param {string} [input]         - texto livre ou URL
-     * @param {Buffer}  [pdfBuffer]     - buffer do PDF enviado via upload
+     * @param {string} [input]
+     * @param {Buffer} [pdfBuffer]
      */
     async verify(input, pdfBuffer) {
-        let aiResponse;
-        let finalContentToAnalyze = "";
+        let aiResponse
 
         try {
             if (pdfBuffer) {
-                finalContentToAnalyze = await this.#extractTextFromPdf(pdfBuffer);
+                const pdfText = await this.#extractTextFromPdf(pdfBuffer)
+
+                const prompt = this.buildPrompt(pdfText)
+
+                aiResponse = await NanoBananaClient.generateContent(prompt)
             } else if (URL_REGEX.test(input)) {
-                finalContentToAnalyze = await this.#extractTextFromUrl(input);
+                const pageText = await this.#extractTextFromUrl(input)
+
+                const prompt = this.buildPrompt(pageText)
+
+                aiResponse = await NanoBananaClient.generateContent(prompt)
             } else {
-                finalContentToAnalyze = input;
+                const prompt = this.buildPrompt(input)
+
+                aiResponse = await NanoBananaClient.generateContent(prompt)
             }
-
-            const prompt = this.buildPrompt(finalContentToAnalyze);
-            aiResponse = await NanoBananaClient.generateContent(prompt);
-
-        } catch (extractionError) {
-             return { error: true, message: extractionError.message, id: "extraction_error" };
+        } catch (error) {
+            return {
+                error: true,
+                message: error.message,
+                id: "verification_error"
+            }
         }
 
-        if (aiResponse?.error) return aiResponse;
-        return this.#parseAiResponse(aiResponse);
+        if (aiResponse?.error) {
+            return aiResponse
+        }
+
+        return this.#parseAiResponse(aiResponse)
     }
 }
 
-module.exports = new VerificationAiCommunication();
+module.exports = new VerificationAiCommunication()
