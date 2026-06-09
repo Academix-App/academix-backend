@@ -1,15 +1,17 @@
 const axios = require("axios")
-const pdfParse = require("pdf-parse")
-
 const NanoBananaClient = new (require("./nanoBananaClient"))()
 
 const URL_REGEX = /^https?:\/\/.+/i
 
 class VerificationAiCommunication {
     /**
-     * @param {string} textContent
+     * @param {string} [textContent]
      */
     buildPrompt(textContent) {
+        const contentBlock = textContent
+            ? `Conteúdo: "${textContent}"`
+            : `Conteúdo: [O conteúdo foi enviado como PDF acima. Analise-o diretamente.]`
+
         return `Você é um perito em jornalismo investigativo e verificação de fatos.
 Sua missão é detectar desinformação com alta precisão.
 
@@ -19,7 +21,7 @@ PROCEDIMENTO DE ANÁLISE:
 3. CETICISMO: Mesmo que a fonte pareça oficial, verifique se não há contradições internas no texto.
 4. VEREDITO: Se houver qualquer dúvida sobre a veracidade, a nota deve ser penalizada.
 
-Conteúdo: "${textContent}"
+${contentBlock}
 
 Retorne APENAS um JSON:
 {
@@ -33,45 +35,18 @@ Retorne APENAS um JSON:
      * @returns {Promise<string>}
      */
     async #extractTextFromUrl(url) {
-        try {
-            const response = await axios.get(url, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0"
-                },
-                timeout: 8000
-            })
+        const response = await axios.get(url, {
+            headers: { "User-Agent": "Mozilla/5.0" },
+            timeout: 8000
+        })
 
-            return response.data
-                .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-                .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-                .replace(/<[^>]+>/g, " ")
-                .replace(/\s+/g, " ")
-                .trim()
-                .slice(0, 12000)
-        } catch (error) {
-            console.log("Erro ao extrair URL:", error.message)
-
-            throw new Error("Falha ao acessar a URL informada.")
-        }
-    }
-
-    /**
-     * @param {Buffer} pdfBuffer
-     * @returns {Promise<string>}
-     */
-    async #extractTextFromPdf(pdfBuffer) {
-        try {
-            const data = await pdfParse(pdfBuffer)
-
-            return data.text
-                .replace(/\s+/g, " ")
-                .trim()
-                .slice(0, 15000)
-        } catch (error) {
-            console.log("Erro ao ler PDF:", error.message)
-
-            throw new Error("Falha ao extrair texto do documento PDF.")
-        }
+        return response.data
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 12000)
     }
 
     /**
@@ -79,14 +54,10 @@ Retorne APENAS um JSON:
      */
     #parseAiResponse(rawResponse) {
         try {
-            const clean = rawResponse
-                .replace(/```json|```/g, "")
-                .trim()
-
+            const clean = rawResponse.replace(/```json|```/g, "").trim()
             return JSON.parse(clean)
         } catch (error) {
             console.log(error)
-
             return {
                 error: true,
                 message: "Erro ao processar resposta da IA.",
@@ -96,41 +67,26 @@ Retorne APENAS um JSON:
     }
 
     /**
-     * @param {string} [input]
-     * @param {Buffer} [pdfBuffer]
+     * @param {string} [input]          - texto livre ou URL
+     * @param {Buffer}  [pdfBuffer]     - buffer do PDF enviado via upload
      */
     async verify(input, pdfBuffer) {
         let aiResponse
 
-        try {
-            if (pdfBuffer) {
-                const pdfText = await this.#extractTextFromPdf(pdfBuffer)
-
-                const prompt = this.buildPrompt(pdfText)
-
-                aiResponse = await NanoBananaClient.generateContent(prompt)
-            } else if (URL_REGEX.test(input)) {
-                const pageText = await this.#extractTextFromUrl(input)
-
-                const prompt = this.buildPrompt(pageText)
-
-                aiResponse = await NanoBananaClient.generateContent(prompt)
-            } else {
-                const prompt = this.buildPrompt(input)
-
-                aiResponse = await NanoBananaClient.generateContent(prompt)
-            }
-        } catch (error) {
-            return {
-                error: true,
-                message: error.message,
-                id: "verification_error"
-            }
+        if (pdfBuffer) {
+            const pdfBase64 = pdfBuffer.toString("base64")
+            const prompt = this.buildPrompt()
+            aiResponse = await NanoBananaClient.generateContentWithPdf(prompt, pdfBase64)
+        } else if (URL_REGEX.test(input)) {
+            const pageText = await this.#extractTextFromUrl(input)
+            const prompt = this.buildPrompt(pageText)
+            aiResponse = await NanoBananaClient.generateContent(prompt)
+        } else {
+            const prompt = this.buildPrompt(input)
+            aiResponse = await NanoBananaClient.generateContent(prompt)
         }
 
-        if (aiResponse?.error) {
-            return aiResponse
-        }
+        if (aiResponse?.error) return aiResponse
 
         return this.#parseAiResponse(aiResponse)
     }
