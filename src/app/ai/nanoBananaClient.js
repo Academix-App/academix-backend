@@ -22,15 +22,9 @@ class NanoBananaClient {
     async generateContent(prompt) {
         try {
             const response = await this.client.models.generateContent({
-                model: "gemini-2.0-flash",
-                contents: [
-                    {
-                        role: "user",
-                        parts: [{ text: prompt }]
-                    }
-                ]
+                model: "gemini-3.5-flash",
+                contents: [{ role: "user", parts: [{ text: prompt }] }]
             })
-
             return response.text
         } catch (error) {
             return this.#handleError(error)
@@ -44,23 +38,30 @@ class NanoBananaClient {
     async generateContentWithPdf(prompt, pdfBase64) {
         try {
             const response = await this.client.models.generateContent({
-                model: "gemini-2.0-flash",
-                contents: [
-                    {
-                        role: "user",
-                        parts: [
-                            {
-                                inlineData: {
-                                    mimeType: "application/pdf",
-                                    data: pdfBase64
-                                }
-                            },
-                            { text: prompt }
-                        ]
-                    }
-                ]
+                model: "gemini-3.5-flash",
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { inlineData: { mimeType: "application/pdf", data: pdfBase64 } },
+                        { text: prompt }
+                    ]
+                }]
             })
+            return response.text
+        } catch (error) {
+            return this.#handleError(error)
+        }
+    }
 
+    /**
+     * @param {{ role: string, parts: { text: string }[] }[]} turns
+     */
+    async generateContentWithHistory(turns) {
+        try {
+            const response = await this.client.models.generateContent({
+                model: "gemini-3.5-flash",
+                contents: turns
+            })
             return response.text
         } catch (error) {
             return this.#handleError(error)
@@ -68,4 +69,4 @@ class NanoBananaClient {
     }
 }
 
-module.exports = new NanoBananaClient()
+module.exports = NanoBananaClient

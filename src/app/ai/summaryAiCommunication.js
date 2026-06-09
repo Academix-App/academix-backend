@@ -1,4 +1,4 @@
-const NanoBananaClient = require("./nanoBananaClient")
+const NanoBananaClient = new (require("./nanoBananaClient"))()
 
 class SummaryAiCommunication {
     /**

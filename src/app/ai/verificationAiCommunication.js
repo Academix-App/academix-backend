@@ -1,5 +1,5 @@
 const axios = require("axios")
-const NanoBananaClient = require("./nanoBananaClient")
+const NanoBananaClient = new (require("./nanoBananaClient"))()
 
 const URL_REGEX = /^https?:\/\/.+/i
 

@@ -70,6 +70,7 @@ CREATE TABLE `activities` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
+
 CREATE TABLE `contents` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `account_id` INT(11) NOT NULL,
@@ -92,6 +93,22 @@ CREATE TABLE `content_summaries` (
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `fk_summary_content` (`content_id`) USING BTREE,
     CONSTRAINT `fk_summary_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+CREATE TABLE `content_chats` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `content_id` INT(11) NOT NULL,
+    `account_id` INT(11) NOT NULL,
+    `role` ENUM('user', 'assistant') NOT NULL,
+    `message` TEXT NOT NULL,
+    `created_at` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `fk_chat_content` (`content_id`) USING BTREE,
+    INDEX `fk_chat_account` (`account_id`) USING BTREE,
+    CONSTRAINT `fk_chat_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT `fk_chat_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
