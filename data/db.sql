@@ -119,7 +119,7 @@ CREATE TABLE `verifications` (
     `input` LONGTEXT NOT NULL,
     `percentage` TINYINT(4) NOT NULL,
     `justification` LONGTEXT NOT NULL,
-    `created_at` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
+	`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `fk_verification_account` (`account_id`) USING BTREE,
     CONSTRAINT `fk_verification_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE

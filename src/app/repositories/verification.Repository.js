@@ -61,7 +61,7 @@ class VerificationRepository {
             input,
             percentage,
             justification,
-            createdAt: Date.now()
+            createdAt: new Date()
         }).catch((e) => {
             console.log(e)
 

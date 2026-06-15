@@ -44,7 +44,7 @@ const Verifications = database.define('verifications', {
         allowNull: false
     },
     createdAt: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.DATE,
         allowNull: false,
         field: "created_at"
     }

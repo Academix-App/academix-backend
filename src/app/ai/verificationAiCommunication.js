@@ -8,12 +8,15 @@ class VerificationAiCommunication {
      * @param {string} [textContent]
      */
     buildPrompt(textContent) {
+        const today = new Date().toLocaleDateString('pt-BR')
+
         const contentBlock = textContent
             ? `Conteúdo: "${textContent}"`
             : `Conteúdo: [O conteúdo foi enviado como PDF acima. Analise-o diretamente.]`
 
         return `Você é um perito em jornalismo investigativo e verificação de fatos.
 Sua missão é detectar desinformação com alta precisão.
+A data de hoje é ${today}. Não trate datas recentes ou futuras como suspeitas apenas por serem recentes.
 
 PROCEDIMENTO DE ANÁLISE:
 1. LEITURA: Identifique as afirmações principais do conteúdo.
