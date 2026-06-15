@@ -14,7 +14,8 @@ class VerificationController {
                         invalid_type_error: "O conteúdo deve ser um texto válido."
                     })
                     .min(10, "O conteúdo deve ter pelo menos 10 caracteres.")
-                    .optional()
+                    .optional(),
+                _hasPdf: zod.boolean().optional()  // <-- linha adicionada
             }, { message: "Foi fornecida uma estrutura inválida." })
             .refine(
                 (data) => data.input !== undefined || data._hasPdf,
@@ -22,10 +23,6 @@ class VerificationController {
             )
     }
 
-    /**
-     * @param {express.Request} req
-     * @param {express.Response} res
-     */
     async index(req, res) {
         const verifications = await VerificationService.findAllVerifications(req.account.id)
         if (verifications?.error) return res.status(500).json(verifications)
@@ -37,10 +34,6 @@ class VerificationController {
         })
     }
 
-    /**
-     * @param {express.Request} req
-     * @param {express.Response} res
-     */
     async show(req, res) {
         const { id } = req.params
 
@@ -54,10 +47,6 @@ class VerificationController {
         })
     }
 
-    /**
-     * @param {express.Request} req
-     * @param {express.Response} res
-     */
     async create(req, res) {
         const pdfFile = req.file ?? null
 
@@ -80,7 +69,7 @@ class VerificationController {
         }
 
         const validation = this.verificationCreateSchema.safeParse({
-            ...req.body,
+            ...Object.fromEntries(Object.entries(req.body)),
             _hasPdf: !!pdfFile
         })
 
@@ -107,10 +96,6 @@ class VerificationController {
         })
     }
 
-    /**
-     * @param {express.Request} req
-     * @param {express.Response} res
-     */
     async delete(req, res) {
         const { id } = req.params
 

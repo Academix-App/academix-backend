@@ -116,9 +116,9 @@ ENGINE=InnoDB;
 CREATE TABLE `verifications` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `account_id` INT(11) NOT NULL,
-    `input` TEXT NOT NULL,
+    `input` LONGTEXT NOT NULL,
     `percentage` TINYINT(4) NOT NULL,
-    `justification` TEXT NOT NULL,
+    `justification` LONGTEXT NOT NULL,
     `created_at` BIGINT(20) NOT NULL DEFAULT (unix_timestamp() * 1000),
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `fk_verification_account` (`account_id`) USING BTREE,

@@ -33,7 +33,7 @@ const Verifications = database.define('verifications', {
     },
     input: {
         type: Sequelize.TEXT('long'),
-        allowNull: false
+        allowNull: true
     },
     percentage: {
         type: Sequelize.TINYINT,

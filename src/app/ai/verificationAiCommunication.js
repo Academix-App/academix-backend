@@ -37,13 +37,24 @@ Retorne APENAS um JSON:
     async #extractTextFromUrl(url) {
         const response = await axios.get(url, {
             headers: { "User-Agent": "Mozilla/5.0" },
-            timeout: 8000
+            timeout: 8000,
+            responseType: "text"
         })
 
-        return response.data
+        const html = typeof response.data === "string"
+            ? response.data
+            : JSON.stringify(response.data)
+
+        return html
             .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
             .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<!--[\s\S]*?-->/g, "")
             .replace(/<[^>]+>/g, " ")
+            .replace(/&nbsp;/gi, " ")
+            .replace(/&amp;/gi, "&")
+            .replace(/&lt;/gi, "<")
+            .replace(/&gt;/gi, ">")
+            .replace(/&quot;/gi, '"')
             .replace(/\s+/g, " ")
             .trim()
             .slice(0, 12000)
